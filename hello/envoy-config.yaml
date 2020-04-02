@@ -1,0 +1,130 @@
+--- 
+  admin: 
+    access_log_path: /tmp/admin_access.log
+    address: 
+      socket_address: 
+        address: "127.0.0.1"
+        port_value: 9901
+  static_resources: 
+    clusters: 
+      - 
+        connect_timeout: 0.25s
+        hosts: 
+          - 
+            socket_address: 
+              address: hello
+              port_value: 8081
+        lb_policy: ROUND_ROBIN
+        name: hello
+        type: strict_dns
+      - 
+        connect_timeout: 0.25s
+        hosts: 
+          - 
+            socket_address: 
+              address: hi_envoy
+              port_value: 8789
+        lb_policy: ROUND_ROBIN
+        name: hi
+        type: strict_dns
+      - 
+        connect_timeout: 0.25s
+        hosts: 
+          - 
+            socket_address: 
+              address: ola_envoy
+              port_value: 8790
+        lb_policy: ROUND_ROBIN
+        name: ola
+        type: strict_dns
+    listeners: 
+      - 
+        address: 
+          socket_address: 
+            address: "0.0.0.0"
+            port_value: 8786
+        filter_chains: 
+          - 
+            filters: 
+              - 
+                config: 
+                  codec_type: AUTO
+                  http_filters: 
+                    - 
+                      name: envoy.router
+                  route_config: 
+                    name: hello-svc-http-route
+                    virtual_hosts: 
+                      - 
+                        domains: 
+                          - "*"
+                        name: hello-svc-http-route
+                        routes: 
+                          - 
+                            match: 
+                              prefix: /
+                            route: 
+                              cluster: hello
+                  stat_prefix: ingress
+                name: envoy.http_connection_manager
+        name: hello-svc-http-listener
+      - 
+        address: 
+          socket_address: 
+            address: "0.0.0.0"
+            port_value: 8788
+        filter_chains: 
+          - 
+            filters: 
+              - 
+                config: 
+                  codec_type: AUTO
+                  http_filters: 
+                    - 
+                      name: envoy.router
+                  route_config: 
+                    name: hi-svc-http-route
+                    virtual_hosts: 
+                      - 
+                        domains: 
+                          - "*"
+                        name: hi-svc-http-route
+                        routes: 
+                          - 
+                            match: 
+                              prefix: /
+                            route: 
+                              cluster: hi
+                  stat_prefix: egress
+                name: envoy.http_connection_manager
+        name: hi-svc-http-listener
+      - 
+        address: 
+          socket_address: 
+            address: "0.0.0.0"
+            port_value: 8791
+        filter_chains: 
+          - 
+            filters: 
+              - 
+                config: 
+                  codec_type: AUTO
+                  http_filters: 
+                    - 
+                      name: envoy.router
+                  route_config: 
+                    name: ola-svc-http-route
+                    virtual_hosts: 
+                      - 
+                        domains: 
+                          - "*"
+                        name: ola-svc-http-route
+                        routes: 
+                          - 
+                            match: 
+                              prefix: /
+                            route: 
+                              cluster: ola
+                  stat_prefix: egress
+                name: envoy.http_connection_manager
+        name: ola-svc-http-listener  

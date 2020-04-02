@@ -1,4 +1,5 @@
-admin:
+--- 
+  admin: 
     access_log_path: "/tmp/admin_access.log"
     address: 
       socket_address: 

@@ -9,7 +9,7 @@ import (
 
 func handler(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Fprintf(w, "Hello from service - Ola")
+	fmt.Fprintf(w, "Hello from service - Ola\n")
 }
 
 func main() {
