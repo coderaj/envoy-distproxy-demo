@@ -34,13 +34,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
+	if err != nil {	
 		fmt.Printf("%s", err)
 	}
 	fmt.Fprintf(w, string(body))
 	fmt.Fprintf(w, "Hello from service - Hello\n")
+	fmt.Fprintf(w, "Calling Service - Ola\n")
 
-	req, err = http.NewRequest("GET", "http://hello_envoy:8791/", nil)
+	req, err = http.NewRequest("GET", "http://hello_envoy:8790/", nil)
 	if err != nil {
 		fmt.Printf("%s", err)
 	}

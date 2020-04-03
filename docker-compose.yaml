@@ -1,50 +1,81 @@
-version: '3'
+version: "3.7"
 services:
   front-envoy:
-    image: envoyproxy/envoy-alpine:latest
+    build: front_envoy/
     volumes:
-      - ./front_envoy/envoy-config.yaml:/etc/envoy-config.yaml
+      - ./front_envoy/envoy-config.yaml:/etc/front-envoy.yaml
+    networks:
+      - envoymesh
+    expose:
+      - "80"
+      - "8001"
     ports:
-      - "8080:80"
+      - "8000:80"
       - "9901:9901"
-    command: "/usr/local/bin/envoy -c /etc/envoy-config.yaml -l info --service-cluster 'front-envoy' --service-node 'front-envoy' --log-format '[METADATA][%Y-%m-%d %T.%e][%t][%l][%n] %v'"
+
+  hello_host:
+    build: hello/
+    networks:
+      envoymesh:
+        aliases:
+          - hello_service
+    ports:
+      - "8081:8081"
+
+  hi_host:
+    build: hi/
+    networks:
+      envoymesh:
+        aliases:
+          - hi_service
+    ports:
+      - "8082:8082"
+
+  ola_host:
+    build: ola/
+    networks:
+      envoymesh:
+        aliases:
+          - ola_service
+    ports:
+      - "8083:8083"
 
   hello_envoy:
     image: envoyproxy/envoy-alpine:latest
     volumes:
       - ./hello/envoy-config.yaml:/etc/envoy-config.yaml
+    networks:
+      envoymesh:
+        aliases:
+          - hello_envoy
     ports:
       - "8786:8786"
       - "8788:8788"
     command: "/usr/local/bin/envoy -c /etc/envoy-config.yaml -l info --service-cluster 'hello' --service-node 'hello' --log-format '[METADATA][%Y-%m-%d %T.%e][%t][%l][%n] %v'"
 
-  hello:
-    build: hello/
-    ports:
-    - "8081:8081"
-
   hi_envoy:
     image: envoyproxy/envoy-alpine:latest
     volumes:
       - ./hi/envoy-config.yaml:/etc/envoy-config.yaml
+    networks:
+      envoymesh:
+        aliases:
+          - hi_envoy
     ports:
       - "8789:8789"
-    command: "/usr/local/bin/envoy -c /etc/envoy-config.yaml -l info --service-cluster 'hi' --service-node 'hi' --log-format '[METADATA][%Y-%m-%d %T.%e][%t][%l][%n] %v'"  
-
-  hi:
-    build: hi/
-    ports:
-    - "8082:8082"
+    command: "/usr/local/bin/envoy -c /etc/envoy-config.yaml -l info --service-cluster 'hi' --service-node 'hi' --log-format '[METADATA][%Y-%m-%d %T.%e][%t][%l][%n] %v'"
 
   ola_envoy:
     image: envoyproxy/envoy-alpine:latest
     volumes:
       - ./ola/envoy-config.yaml:/etc/envoy-config.yaml
+    networks:
+      envoymesh:
+        aliases:
+          - ola_envoy
     ports:
       - "8790:8790"
-    command: "/usr/local/bin/envoy -c /etc/envoy-config.yaml -l info --service-cluster 'ola' --service-node 'ola' --log-format '[METADATA][%Y-%m-%d %T.%e][%t][%l][%n] %v'"  
+    command: "/usr/local/bin/envoy -c /etc/envoy-config.yaml -l info --service-cluster 'ola' --service-node 'ola' --log-format '[METADATA][%Y-%m-%d %T.%e][%t][%l][%n] %v'"
 
-  ola:
-    build: ola/
-    ports:
-    - "8083:8083" 
+networks:
+  envoymesh: {}
